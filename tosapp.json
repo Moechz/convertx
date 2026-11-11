@@ -1,0 +1,94 @@
+{
+  "app_id": "convertxdocker",
+  "title": "ConvertX",
+  "image": "c4illin/convertx:v0.17.0",
+  "repo_name": "convertx",
+  "mode": "plain",
+  "container_port": 3000,
+  "category": [
+    "Utilities"
+  ],
+  "volumes": [
+    {
+      "host": "/Volume1/DockerAppData/convertxdocker/data",
+      "container": "/app/data"
+    }
+  ],
+  "env": {
+    "TZ": "Asia/Shanghai"
+  },
+  "auth": "C4illin",
+  "upstream_url": "https://github.com/C4illin/ConvertX",
+  "upstream_license": "AGPL-3.0",
+  "descript": "💾 Self-hosted online file converter. Supports 1000+ formats ⚙️. Packaged for TerraMaster TOS 7: the official Docker Hub image runs as a container on your NAS, keeps its data in the application data folder (so it survives restarts and updates), and is opened from its desktop icon.",
+  "release_note": "1. First release.",
+  "important": "First run: open the web UI and complete the initial setup. Data lives in /Volume1/DockerAppData/convertxdocker/ and survives restarts and updates. The container runs as uid 1000, so mounted folders must be readable by that user. Needs DockerEngine; configure a registry mirror if Docker Hub is unreachable. Back up the application data folder before uninstalling with data removal. Plain HTTP on the LAN.",
+  "probe": {
+    "user_in_image": "(root)",
+    "entrypoint": [
+      "bun",
+      "run",
+      "dist/src/index.js"
+    ],
+    "cmd": null,
+    "exposed_ports": [
+      3000
+    ],
+    "declared_volumes": [],
+    "image_healthcheck": [],
+    "digest": "c4illin/convertx@sha256:e1f85be04bbaf8a55ead9261194c3ae0fa0957d303ea537127154860b2552afd",
+    "architecture": "x86_64",
+    "platforms": [],
+    "http_client_in_image": "curl",
+    "trial_run": {
+      "ok": false,
+      "http_code": "",
+      "state": "exited",
+      "paths": [],
+      "host_port": 18000,
+      "log_tail": "ConvertX v0.17.0\nDebian GNU/Linux 13 (trixie)\n1 | import { mkdirSync } from \"node:fs\";\n2 | import { Database } from \"bun:sqlite\";\n3 | mkdirSync(\"./data\", { recursive: true });\n4 | const db = new Database(\"./data/mydb.sqlite\", { create: true });\n               ^\nSQLiteError: unable to open database file\n      errno: 14,\n byteOffset: -1,\n       code: \"SQLITE_CANTOPEN\"\n\n      at new Database (bun:sqlite:236:28)\n      at /app/dist/src/db/db.js:4:12\n\nBun v1.2.2 (Linux x64 baseline)",
+      "files_in_mounts": ""
+    },
+    "docker_hub": {},
+    "github": {
+      "owner": "C4illin",
+      "repo": "ConvertX",
+      "description": "💾 Self-hosted online file converter. Supports 1000+ formats ⚙️",
+      "license": "AGPL-3.0",
+      "homepage": ""
+    }
+  },
+  "healthcheck": [
+    "CMD-SHELL",
+    "wget -q -O /dev/null http://127.0.0.1:3000/ || exit 1"
+  ],
+  "entrypoint_file": "src/entrypoint.sh",
+  "platform": "x86_64",
+  "user": "1000:1000",
+  "publisher": "Moechz",
+  "compose_project": "convertxdocker",
+  "github_repo": "convertx",
+  "upstream_version": "0.17.0",
+  "release_tag_prefix": "v",
+  "version": "0.17.0-1",
+  "help": "https://github.com/Moechz/convertx/issues",
+  "official": "https://github.com/C4illin/ConvertX",
+  "license": "AGPL-3.0",
+  "docker_socket": false,
+  "group_add": [],
+  "platforms": [
+    "x86_64",
+    "aarch64"
+  ],
+  "translations": {
+    "zh-cn": {
+      "descript": "在线文件格式转换，支持图片、文档、音视频等数百种格式。",
+      "important": "首次使用请打开网页完成初始化。数据保存在 DockerAppData/convertxdocker，重启和升级不会丢失。容器以 uid 1000 运行，挂载目录需对该用户可读。需要 DockerEngine；Docker Hub 不可达时先配置镜像加速。卸载并删除数据前请备份。局域网内为 HTTP。"
+    },
+    "zh-hk": {
+      "descript": "在线文件格式转换，支持图片、文档、音视频等数百种格式。",
+      "important": "首次使用請開啟網頁完成初始化。資料保存在 DockerAppData/convertxdocker，重新啟動和升級不會遺失。容器以 uid 1000 運行，掛載目錄需對該使用者可讀。需要 DockerEngine；Docker Hub 不可達時先設定鏡像加速。解除安裝並刪除資料前請備份。區域網路內為 HTTP。"
+    }
+  },
+  "host_port": 8070
+}
