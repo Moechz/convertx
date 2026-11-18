@@ -22,6 +22,11 @@
 #           writable home directory. The compose `user:` bypasses the image
 #           entrypoint's PUID handling, so HOME is set explicitly to the
 #           convertx account's home that the image already creates (uid 1000).
+# LOGIN: ConvertX marks its session cookie Secure unless HTTP_ALLOWED=true, so
+#           without it login loops forever when the app is opened at
+#           http://<NAS-IP>:8070 (TOS always opens Docker apps over plain HTTP).
+#           ACCOUNT_REGISTRATION=false still allows the FIRST account and closes
+#           open registration afterwards.
 #
 # NOTE for maintainers: never place a comment line directly in front of a
 # "- value" sequence item (ports, volumes, ...). The official
@@ -40,6 +45,8 @@ services:
     environment:
       TZ: "Asia/Shanghai"
       HOME: "/home/convertx"
+      HTTP_ALLOWED: "true"
+      ACCOUNT_REGISTRATION: "false"
     volumes:
       - /Volume1/DockerAppData/convertxdocker/data:/app/data
     healthcheck:

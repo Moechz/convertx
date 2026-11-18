@@ -24,10 +24,19 @@ Each archive holds exactly four files:
 |---|---|
 | Container image | `c4illin/convertx:v0.20.0` (Docker Hub, upstream image used unmodified) |
 | Open | `http://<NAS-IP>:8070/` (container port 3000) |
-| First run | create the first account in the web UI, then log in |
+| First run | open `http://<NAS-IP>:8070/` and **create the first account immediately**, then log in |
 | Runs as | non-root, `user: "1000:1000"`, `HOME=/home/convertx` |
 | Persistent data | `/app/data` → `/Volume1/DockerAppData/convertxdocker/data` |
 | Logs | `docker logs convertxdocker` (stdout/stderr) |
+
+Environment (fixed in the package):
+
+| Variable | Value | Why |
+|---|---|---|
+| `TZ` | `Asia/Shanghai` | correct timestamps |
+| `HOME` | `/home/convertx` | LibreOffice, Calibre and fontconfig need a writable home when the container runs as uid 1000 |
+| `HTTP_ALLOWED` | `true` | the upstream session cookie is `Secure` by default, which breaks login at a plain-HTTP `http://<NAS-IP>:8070` address; TOS always opens Docker apps over HTTP |
+| `ACCOUNT_REGISTRATION` | `false` | the first account can still be created, but nobody else can register afterwards |
 
 ConvertX converts images, documents, e-books, audio, video and data files between
 more than a thousand format combinations, using the converters bundled in the
@@ -42,6 +51,8 @@ password protection.
   because LibreOffice, Calibre and fontconfig need a writable home. Without it, document and
   e-book conversions can fail under a non-root user.
 - **Fixed image tag, never `:latest`**, Docker Hub only, no `privileged`, no `network_mode: host`, no Docker socket, no `cap_add`.
+- **Login works on the NAS.** `HTTP_ALLOWED=true` because the TOS App Center opens the app at a plain-HTTP LAN address and ConvertX would otherwise mark its session cookie `Secure` and loop at the login page.
+- **No open registration.** `ACCOUNT_REGISTRATION=false`: the first account is yours, later self-registration is disabled.
 - **Health check** with the image's own `curl` against `http://127.0.0.1:3000/`, 60 s start period.
 - **Data survives restarts**; `restart: unless-stopped` brings the app back after a NAS reboot.
 - **Deterministic build**: GNU tar with uid/gid 0 and zeroed timestamps, gzip without a timestamp.
@@ -113,8 +124,8 @@ Full details: [NOTICE.md](NOTICE.md).
 
 ```bash
 scripts/build-dual.sh              # both architectures -> out/convertxdocker_{x86_64,aarch64}.tar.gz
-scripts/build.sh 0.20.0-2          # single iteration bump (x86_64)
-scripts/build.sh 0.20.0-1 aarch64  # one architecture only
+scripts/build.sh 0.20.0-3          # single iteration bump (x86_64)
+scripts/build.sh 0.20.0-2 aarch64  # one architecture only
 ```
 
 The build stages the four files, substitutes the version/platform placeholders,
@@ -141,12 +152,12 @@ bash test/install-and-verify.sh                  # on-device E2E (needs root)
 ## Store submission checklist
 
 1. Public GitHub repo (code + README only).
-2. Release **tag `v0.20.0-1`** with four assets:
+2. Release **tag `v0.20.0-2`** with four assets:
    `convertxdocker_x86_64.tar.gz` + `.sha256`,
    `convertxdocker_aarch64.tar.gz` + `.sha256`.
 3. Developer platform: two App records with the same ID `convertxdocker`, package
    type Docker, architectures `x86_64` and `aarch64`.
-4. Version Management → Add Version `0.20.0-1` for each architecture →
+4. Version Management → Add Version `0.20.0-2` for each architecture →
    automated validation → review.
 
 ## Limitations
@@ -156,9 +167,15 @@ bash test/install-and-verify.sh                  # on-device E2E (needs root)
 - Converted files are removed automatically after 1 hour by default
   (`AUTO_DELETE_EVERY_N_HOURS`); download them or change the setting if you need
   them longer.
-- The web UI is plain HTTP on the LAN; put it behind a TLS reverse proxy before
-  exposing it to the internet, and protect the first account with a strong
-  password.
+- The web UI is plain HTTP on the LAN and the session cookie is allowed over
+  HTTP (`HTTP_ALLOWED=true`) so login works from the NAS address; put it behind a
+  TLS reverse proxy before exposing it to the internet, and protect the first
+  account with a strong password.
+- Self-registration is closed after the first account. If you lose that account,
+  remove the data folder (or use a new one) to create a fresh first account.
+- `JWT_SECRET` is not set in the package, so ConvertX generates a random signing
+  key on each start: a container restart logs users out (accounts and data are
+  kept). Set your own `JWT_SECRET` if that matters to you.
 - Docker applications cannot be updated in place by the App Center; to upgrade,
   uninstall and reinstall — the data folder is kept by default.
 

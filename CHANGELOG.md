@@ -2,6 +2,20 @@
 
 All notable user-visible changes to the ConvertX TOS application package.
 
+## 0.20.0-2 — 2026-11-18
+
+### Fixed
+- **Login over the NAS address.** ConvertX marks its session cookie `Secure`
+  unless `HTTP_ALLOWED=true`, so at the App Center's plain-HTTP address
+  (`http://<NAS-IP>:8070`) the login page looped and the app could not be used.
+  The package now sets `HTTP_ALLOWED=true`.
+- **Open registration.** `ACCOUNT_REGISTRATION=false` — the first account can
+  still be created, but nobody else can register afterwards. Create the first
+  account immediately after installation.
+
+`0.20.0-1` was published and withdrawn in the same review round; `0.20.0-2` is
+the version submitted. All other changes from `0.20.0-1` are included.
+
 ## 0.20.0-1 — 2026-11-18
 
 Remediation of the conditional-approval review of `0.17.0-2`, plus an upstream

@@ -2,7 +2,7 @@
 
 **Last updated:** 18 November 2026
 **Data controller / contact:** Moechz — moechz@163.com
-**Applies to:** version `0.20.0-1` and later of the TOS application
+**Applies to:** version `0.20.0-2` and later of the TOS application
 `convertxdocker`, the container image it runs and this repository.
 
 ## 1. Summary
@@ -66,9 +66,17 @@ for requests about the website or the publishing records.
 - The image tag is **pinned**; the package is updated when upstream ships
   security fixes.
 - Data stays inside the application data folder, owned by the app user.
-- The first account you create protects the web UI; change the password if you
-  create additional users. If you expose the UI outside the LAN, put it behind a
-  TLS reverse proxy and keep the app updated.
+- The first account you create protects the web UI. **Self-registration is
+  disabled** in the package (`ACCOUNT_REGISTRATION=false`), so nobody else can
+  create an account afterwards.
+- The session cookie is allowed over plain HTTP (`HTTP_ALLOWED=true`) because the
+  TOS App Center opens Docker applications at an `http://<NAS-IP>:<port>` address;
+  without it, login does not work. On a LAN this is the normal TOS model, but the
+  cookie is not TLS-protected: put the app behind a TLS reverse proxy before
+  exposing it outside your LAN.
+- `JWT_SECRET` is not fixed in the package, so the signing key is regenerated on
+  every container start; this invalidates sessions (not accounts or data) after a
+  restart.
 
 ## 6. Third-party sharing and API disclosure
 
