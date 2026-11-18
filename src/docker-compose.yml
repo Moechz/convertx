@@ -1,7 +1,7 @@
 # ===========================================================================
 # ConvertX for TerraMaster TOS 7 (Docker application)
 # ===========================================================================
-# Upstream image : c4illin/convertx:v0.17.0 (Docker Hub, used unmodified)
+# Upstream image : c4illin/convertx:v0.20.0 (Docker Hub, used unmodified)
 #                  -> https://github.com/C4illin/ConvertX
 #
 # Ports   : host 8070 -> container 3000. The host port is in the
@@ -18,6 +18,11 @@
 # Escaping: docker compose interpolates ${VAR}/$VAR in compose files, so any
 #           '$' meant for the shell is written '$$'.
 #
+# HOME: the image's converters (LibreOffice, Calibre, fontconfig) need a
+#           writable home directory. The compose `user:` bypasses the image
+#           entrypoint's PUID handling, so HOME is set explicitly to the
+#           convertx account's home that the image already creates (uid 1000).
+#
 # NOTE for maintainers: never place a comment line directly in front of a
 # "- value" sequence item (ports, volumes, ...). The official
 # TOSAppSelfTestingTool parses the compose file line by line; a comment inside
@@ -26,7 +31,7 @@
 
 services:
   convertxdocker:
-    image: c4illin/convertx:v0.17.0
+    image: c4illin/convertx:v0.20.0
     container_name: convertxdocker
     restart: unless-stopped
     user: "1000:1000"
@@ -34,14 +39,15 @@ services:
       - "8070:3000"
     environment:
       TZ: "Asia/Shanghai"
+      HOME: "/home/convertx"
     volumes:
       - /Volume1/DockerAppData/convertxdocker/data:/app/data
     healthcheck:
-      test: ["CMD-SHELL", "bun -e \"fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.status<500?0:1)).catch(()=>process.exit(1))\" || exit 1"]
+      test: ["CMD-SHELL", "curl -fsS -o /dev/null http://127.0.0.1:3000/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 30s
+      start_period: 60s
 
 # TOS App Center web metadata (must be the last block of the file):
 # web.port is the published host port above, protocol is http.

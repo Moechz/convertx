@@ -1,7 +1,7 @@
 {
   "app_id": "convertxdocker",
   "title": "ConvertX",
-  "image": "c4illin/convertx:v0.17.0",
+  "image": "c4illin/convertx:v0.20.0",
   "repo_name": "convertx",
   "mode": "plain",
   "container_port": 3000,
@@ -15,63 +15,28 @@
     }
   ],
   "env": {
-    "TZ": "Asia/Shanghai"
+    "TZ": "Asia/Shanghai",
+    "HOME": "/home/convertx"
   },
   "auth": "C4illin",
   "upstream_url": "https://github.com/C4illin/ConvertX",
   "upstream_license": "AGPL-3.0",
-  "descript": "💾 Self-hosted online file converter. Supports 1000+ formats ⚙️. Packaged for TerraMaster TOS 7: the official Docker Hub image runs as a container on your NAS, keeps its data in the application data folder (so it survives restarts and updates), and is opened from its desktop icon.",
-  "release_note": "1. First release.",
-  "important": "First run: open the web UI and complete the initial setup. Data lives in /Volume1/DockerAppData/convertxdocker/ and survives restarts and updates. The container runs as uid 1000, so mounted folders must be readable by that user. Needs DockerEngine; configure a registry mirror if Docker Hub is unreachable. Back up the application data folder before uninstalling with data removal. Plain HTTP on the LAN.",
-  "probe": {
-    "user_in_image": "(root)",
-    "entrypoint": [
-      "bun",
-      "run",
-      "dist/src/index.js"
-    ],
-    "cmd": null,
-    "exposed_ports": [
-      3000
-    ],
-    "declared_volumes": [],
-    "image_healthcheck": [],
-    "digest": "c4illin/convertx@sha256:e1f85be04bbaf8a55ead9261194c3ae0fa0957d303ea537127154860b2552afd",
-    "architecture": "x86_64",
-    "platforms": [],
-    "http_client_in_image": "curl",
-    "trial_run": {
-      "ok": false,
-      "http_code": "",
-      "state": "exited",
-      "paths": [],
-      "host_port": 18000,
-      "log_tail": "ConvertX v0.17.0\nDebian GNU/Linux 13 (trixie)\n1 | import { mkdirSync } from \"node:fs\";\n2 | import { Database } from \"bun:sqlite\";\n3 | mkdirSync(\"./data\", { recursive: true });\n4 | const db = new Database(\"./data/mydb.sqlite\", { create: true });\n               ^\nSQLiteError: unable to open database file\n      errno: 14,\n byteOffset: -1,\n       code: \"SQLITE_CANTOPEN\"\n\n      at new Database (bun:sqlite:236:28)\n      at /app/dist/src/db/db.js:4:12\n\nBun v1.2.2 (Linux x64 baseline)",
-      "files_in_mounts": ""
-    },
-    "docker_hub": {},
-    "github": {
-      "owner": "C4illin",
-      "repo": "ConvertX",
-      "description": "💾 Self-hosted online file converter. Supports 1000+ formats ⚙️",
-      "license": "AGPL-3.0",
-      "homepage": ""
-    }
-  },
+  "descript": "ConvertX is a self-hosted file converter: convert images, documents, e-books, audio, video and data files between more than a thousand format combinations, using the converters bundled in the image (ImageMagick, ffmpeg, LibreOffice, Pandoc, Calibre, Inkscape and others). It supports batch conversion, multiple accounts and password protection. This package runs the upstream Docker Hub image as a non-root container and keeps its data in the application data folder on the NAS.",
+  "release_note": "0.20.0-1: upgraded to ConvertX 0.20.0 (latest upstream release; security and converter fixes); added the privacy policy (linked from Help) and a licence notice; documented data retention, user rights and the deletion channel; set a writable HOME so the bundled converters (LibreOffice, Calibre) work for the non-root user; refreshed the icon; corrected the description to the features actually delivered. Rectified per review comments.",
+  "important": "Open http://<NAS-IP>:8070/ and create the first account, then log in. Uploaded files and conversion history stay in /Volume1/DockerAppData/convertxdocker/data; the app deletes converted files after 1 hour by default. The container runs as uid 1000 with HOME=/home/convertx so the bundled converters work. Needs DockerEngine; use a registry mirror if Docker Hub is unreachable. No telemetry and no external requests besides the image pull. Privacy policy: see the Help link. Plain HTTP on the LAN.",
   "healthcheck": [
     "CMD-SHELL",
-    "wget -q -O /dev/null http://127.0.0.1:3000/ || exit 1"
+    "curl -fsS -o /dev/null http://127.0.0.1:3000/ || exit 1"
   ],
-  "entrypoint_file": "src/entrypoint.sh",
   "platform": "x86_64",
   "user": "1000:1000",
   "publisher": "Moechz",
   "compose_project": "convertxdocker",
   "github_repo": "convertx",
-  "upstream_version": "0.17.0",
+  "upstream_version": "0.20.0",
   "release_tag_prefix": "v",
-  "version": "0.17.0-2",
-  "help": "https://github.com/Moechz/convertx/issues",
+  "version": "0.20.0-1",
+  "help": "https://github.com/Moechz/convertx/blob/main/PRIVACY.md",
   "official": "https://github.com/C4illin/ConvertX",
   "license": "AGPL-3.0",
   "docker_socket": false,
@@ -82,12 +47,14 @@
   ],
   "translations": {
     "zh-cn": {
-      "descript": "在线文件格式转换，支持图片、文档、音视频等数百种格式。",
-      "important": "首次使用请打开网页完成初始化。数据保存在 DockerAppData/convertxdocker，重启和升级不会丢失。容器以 uid 1000 运行，挂载目录需对该用户可读。需要 DockerEngine；Docker Hub 不可达时先配置镜像加速。卸载并删除数据前请备份。局域网内为 HTTP。"
+      "descript": "ConvertX 是一个自托管的文件转换器：用镜像内置的转换工具（ImageMagick、ffmpeg、LibreOffice、Pandoc、Calibre、Inkscape 等）在图片、文档、电子书、音视频和数据文件之间转换，支持一千多种格式组合、批量转换、多账号与密码保护。本应用以非 root 容器运行上游 Docker Hub 镜像，数据保存在 NAS 的应用数据目录中。",
+      "release_note": "0.20.0-1：升级到上游最新版 ConvertX 0.20.0（含安全与转换修复）；新增隐私政策（帮助链接）与许可证声明，写明数据保留期、用户权利与删除渠道；为内置转换工具设置可写 HOME，使非 root 用户下 LibreOffice/Calibre 等转换可用；更新图标；描述改为与实际功能一致。按审核意见整改。",
+      "important": "打开 http://<NAS-IP>:8070/ 创建第一个账号并登录。上传的文件与转换记录保存在 /Volume1/DockerAppData/convertxdocker/data；转换结果会由应用自动清理（默认 1 小时后）。容器以 uid 1000 运行并设置 HOME=/home/convertx，内置转换工具可正常工作。需要 DockerEngine；Docker Hub 不可达时先配置镜像加速。无遥测，除拉取镜像外不访问外部网络。隐私政策见帮助链接。局域网内为 HTTP。"
     },
     "zh-hk": {
-      "descript": "在线文件格式转换，支持图片、文档、音视频等数百种格式。",
-      "important": "首次使用請開啟網頁完成初始化。資料保存在 DockerAppData/convertxdocker，重新啟動和升級不會遺失。容器以 uid 1000 運行，掛載目錄需對該使用者可讀。需要 DockerEngine；Docker Hub 不可達時先設定鏡像加速。解除安裝並刪除資料前請備份。區域網路內為 HTTP。"
+      "descript": "ConvertX 是一個自託管的檔案轉換器：用映像內建的轉換工具（ImageMagick、ffmpeg、LibreOffice、Pandoc、Calibre、Inkscape 等）在圖片、文件、電子書、影音與資料檔之間轉換，支援一千多種格式組合、批次轉換、多帳號與密碼保護。本應用以非 root 容器執行上游 Docker Hub 映像，資料保存在 NAS 的應用資料目錄中。",
+      "release_note": "0.20.0-1：升級到上游最新版 ConvertX 0.20.0（含安全與轉換修正）；新增隱私政策（說明連結）與授權聲明，寫明資料保留期、使用者權利與刪除管道；為內建轉換工具設定可寫 HOME，使非 root 使用者下 LibreOffice/Calibre 等轉換可用；更新圖示；描述改為與實際功能一致。依審核意見整改。",
+      "important": "開啟 http://<NAS-IP>:8070/ 建立第一個帳號並登入。上傳的檔案與轉換記錄保存在 /Volume1/DockerAppData/convertxdocker/data；轉換結果會由應用自動清理（預設 1 小時後）。容器以 uid 1000 執行並設定 HOME=/home/convertx，內建轉換工具可正常運作。需要 DockerEngine；Docker Hub 不可達時先設定鏡像加速。無遙測，除拉取映像外不存取外部網路。隱私政策見說明連結。區域網路內為 HTTP。"
     }
   },
   "host_port": 8070
